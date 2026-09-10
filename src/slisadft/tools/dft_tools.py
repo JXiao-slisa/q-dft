@@ -438,7 +438,8 @@ def dft_optimize_tool(input_structure: str, calculator: str = "vasp",
     # Mock engine mode: deterministic synthetic run without any real binary.
     if is_mock():
         from ..engines.mock import run_mock_dft
-        workdir = Path(tempfile.mkdtemp(prefix=f"slisa_{calculator}_mock_", dir="."))
+        # Mock runs land in the system temp dir so dev/test repos stay clean.
+        workdir = Path(tempfile.mkdtemp(prefix=f"slisa_{calculator}_mock_"))
         try:
             result = run_mock_dft(calculator, input_structure, workdir,
                                   relax=relax, freq=freq,

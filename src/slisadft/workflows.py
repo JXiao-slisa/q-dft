@@ -49,6 +49,14 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _scratch_dir() -> str:
+    """Scratch dir for intermediate build files (never pollutes the repo)."""
+    import tempfile
+    d = Path(tempfile.gettempdir()) / "qdft_scratch"
+    d.mkdir(parents=True, exist_ok=True)
+    return str(d)
+
+
 def _parse_json_tool_output(raw: str, what: str) -> Dict[str, object]:
     try:
         data = json.loads(raw)
@@ -100,7 +108,9 @@ def run_adsorption_full(inputs: Optional[dict] = None,
         raise RuntimeError(f"slab build failed: {slab_raw}")
     surfaces["slab"] = str(slab_raw)
 
-    mol_raw = build_molecule_tool.func(adsorbate)
+    mol_raw = build_molecule_tool.func(
+        adsorbate,
+        output_file=str(Path(_scratch_dir()) / f"molecule_{adsorbate}.vasp"))
     if str(mol_raw).startswith("Error"):
         raise RuntimeError(f"molecule build failed: {mol_raw}")
     surfaces["adsorbate"] = str(mol_raw)

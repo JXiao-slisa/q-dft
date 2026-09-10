@@ -1,9 +1,9 @@
 # Adsorption-energy workflow report (adsorption-full)
 
-- generated: 2026-09-10T21:17:04.122333+00:00
+- generated: 2026-09-10T21:36:13.677437+00:00
 - engine mode: **mock**  ⚠ SYNTHETIC mock data (Rule Zero)
 - protocol: build -> MLIP relax -> DFT single point (three systems)
-- elapsed: 1.1 s
+- elapsed: 1.0 s
 
 ## Inputs
 
@@ -44,16 +44,16 @@
 ### slab
 - structure: `D:\Zcode\slisa\editions\q-dft\Pt_111_3l.vasp`
 - MLIP optimized: `D:\Zcode\slisa\editions\q-dft\Pt_111_3l_slab_mlip_opt.vasp` (E=2.508707964720619, converged=True)
-- DFT workdir: `slisa_vasp_mock_nboohrys\vasp` (converged=True)
+- DFT workdir: `C:\Users\ADMINI~1\AppData\Local\Temp\2\slisa_vasp_mock_rfo5_dee\vasp` (converged=True)
 
 ### adsorbate
-- structure: `D:\Zcode\slisa\editions\q-dft\OH.vasp`
-- MLIP optimized: `D:\Zcode\slisa\editions\q-dft\OH_adsorbate_mlip_opt.vasp` (E=2.1794586741746698, converged=True)
-- DFT workdir: `slisa_vasp_mock_60z8dk8y\vasp` (converged=True)
+- structure: `C:\Users\ADMINI~1\AppData\Local\Temp\2\qdft_scratch\molecule_OH.vasp`
+- MLIP optimized: `C:\Users\ADMINI~1\AppData\Local\Temp\2\qdft_scratch\molecule_OH_adsorbate_mlip_opt.vasp` (E=2.1794586741746698, converged=True)
+- DFT workdir: `C:\Users\ADMINI~1\AppData\Local\Temp\2\slisa_vasp_mock_ej8hpzuv\vasp` (converged=True)
 
 ### slab_ads
 - structure: `D:\Zcode\slisa\editions\q-dft\Pt_111_3l_OH_fcc.vasp`
 - MLIP optimized: `D:\Zcode\slisa\editions\q-dft\Pt_111_3l_OH_fcc_slab_ads_mlip_opt.vasp` (E=4.688215263942662, converged=True)
-- DFT workdir: `slisa_vasp_mock_1hli9s4t\vasp` (converged=True)
+- DFT workdir: `C:\Users\ADMINI~1\AppData\Local\Temp\2\slisa_vasp_mock_kxgojwaf\vasp` (converged=True)
 
 *All energies traceable to the calculation files in the referenced workdirs (Rule Zero).*
