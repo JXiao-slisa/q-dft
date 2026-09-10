@@ -69,7 +69,8 @@ def _build_slab(element: str, miller: Tuple[int, int, int] = (1, 1, 1),
 @tool
 def build_surface_tool(element: str, miller_index: str = "(111)",
                        layers: int = 3, size: str = "2,2",
-                       vacuum: float = 10.0) -> str:
+                       vacuum: float = 10.0,
+                       output_file: str = "") -> str:
     """Build a clean metal surface model (slab).
 
     Args:
@@ -78,6 +79,7 @@ def build_surface_tool(element: str, miller_index: str = "(111)",
         layers: number of atomic layers.
         size: surface supercell size as 'nx,ny' (e.g. '2,2', '3,3').
         vacuum: vacuum thickness in Angstroms.
+        output_file: optional explicit output path (default: cwd-relative name).
 
     Returns:
         Absolute path to the created POSCAR file.
@@ -98,8 +100,11 @@ def build_surface_tool(element: str, miller_index: str = "(111)",
 
     slab = _build_slab(element, miller, layers, size_tuple, vacuum)
     # Write out.
-    safe_miller = miller_index.replace("(", "").replace(")", "").replace(",", "")
-    filepath = f"{element}_{safe_miller}_{layers}l.vasp"
+    if output_file:
+        filepath = output_file
+    else:
+        safe_miller = miller_index.replace("(", "").replace(")", "").replace(",", "")
+        filepath = f"{element}_{safe_miller}_{layers}l.vasp"
     write(filepath, slab, format="vasp")
     return os.path.abspath(filepath)
 

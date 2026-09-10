@@ -99,24 +99,30 @@ def run_adsorption_full(inputs: Optional[dict] = None,
 
     manifest = create_run_manifest("adsorption-full", cfg)
 
-    # -- 三体系建模 ------------------------------------------------------
+    # -- 三体系建模（全部写入 scratch，不污染工作目录）--------------------
+    import uuid
+    scratch = Path(_scratch_dir()) / f"adsfull_{uuid.uuid4().hex[:8]}"
+    scratch.mkdir(parents=True, exist_ok=True)
+
     surfaces = {}
     slab_raw = build_surface_tool.func(
         element, str(cfg["miller"]), int(cfg["layers"]),
-        str(cfg["size"]), float(cfg["vacuum"]))
+        str(cfg["size"]), float(cfg["vacuum"]),
+        output_file=str(scratch / "slab.vasp"))
     if str(slab_raw).startswith("Error"):
         raise RuntimeError(f"slab build failed: {slab_raw}")
     surfaces["slab"] = str(slab_raw)
 
     mol_raw = build_molecule_tool.func(
         adsorbate,
-        output_file=str(Path(_scratch_dir()) / f"molecule_{adsorbate}.vasp"))
+        output_file=str(scratch / f"molecule_{adsorbate}.vasp"))
     if str(mol_raw).startswith("Error"):
         raise RuntimeError(f"molecule build failed: {mol_raw}")
     surfaces["adsorbate"] = str(mol_raw)
 
     ads_raw = build_adsorption_tool.func(surfaces["slab"], adsorbate,
-                                         str(cfg["site"]))
+                                         str(cfg["site"]),
+                                         output_file=str(scratch / "slab_ads.vasp"))
     if str(ads_raw).startswith("Error"):
         raise RuntimeError(f"adsorption build failed: {ads_raw}")
     surfaces["slab_ads"] = str(ads_raw)
@@ -297,7 +303,7 @@ def run_batch(combos: List[dict], out_csv: Optional[str] = None,
             "calculator": base["dft_calculator"],
         }
         try:
-            r = run_adsorption_full(combo, workdir=workdir)
+            r = run_adsorption_full(combo, workdir=workdir or _scratch_dir())
             en = r["energies_eV"]
             row.update({
                 "e_slab_ads_eV": en["slab_ads"], "e_slab_eV": en["slab"],
