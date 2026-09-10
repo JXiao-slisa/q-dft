@@ -2,7 +2,7 @@
 
 # ⚛️ q-dft agent
 
-### 🚀 自主进化的 AI 多智能体 · 第一性原理计算催化研究系统
+### 🚀 Self-Evolving AI Multi-Agent System for Autonomous DFT Catalysis Research
 
 **Quantum · Autonomous · Trustworthy**
 
@@ -10,80 +10,83 @@
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://www.python.org)
 [![crewAI](https://img.shields.io/badge/multi--agent-crewAI-FF4F5B)](https://github.com/crewAIInc/crewAI)
 [![Tests](https://img.shields.io/badge/tests-60%20passing-3FB950)](tests)
-[![Mock Mode](https://img.shields.io/badge/offline-mock%20engine-8B5CF6)](#-30-秒极速体验)
+[![Mock Mode](https://img.shields.io/badge/offline-mock%20engine-8B5CF6)](#-30-second-quickstart)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff69b4)](CONTRIBUTING.md)
 
-*让 LLM 智能体替你跑 DFT，让每一张图都可溯源。*
+*Let LLM agents run your DFT workflows — with every number traceable to a real calculation.*
 
-`建模` → `MLIP 预优化` → `DFT 计算` → `后处理分析` → `研究报告`，全自动。
+`Model` → `MLIP pre-optimize` → `DFT` → `Post-process` → `Report` — fully automated.
 
 </div>
 
 ---
 
-## ⚡ 这是什么
+## ⚡ What is it
 
-**q-dft agent** 是一个开源（Apache-2.0）的 **AI 多智能体第一性原理计算平台**。
-五个领域专家智能体组成数字科研团队，自主完成从晶体表面建模到学术论文级
-研究报告的完整 DFT 计算催化流程 —— 而 **Rule Zero 机制** 保证它永远不会
-编造一个数字。
+**q-dft agent** is an open-source (Apache-2.0) **AI multi-agent platform for
+first-principles (DFT) computational catalysis research**, delivered as a
+CLI / Python agent. A crew of five domain-expert agents autonomously runs the
+complete pipeline — from surface model construction to publication-grade
+research reports — while the **Rule Zero mechanism** guarantees it will never
+fabricate a single number.
 
 ```text
   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌──────────────┐   ┌─────────────┐
   │ 🔬 Surface  │──▶│ ⚡ MLIP     │──▶│ 🧮 DFT      │──▶│ 📊 Postproc  │──▶│ 📝 Report   │
   │ Scientist   │   │ Optimizer   │   │ Engineer    │   │ Analyst      │   │ Writer      │
-  │ 建模/吸附位  │   │ MACE / DPA  │   │VASP/CP2K/   │   │E_ad/自由能/  │   │ 中英文报告   │
-  │             │   │ 预优化      │   │ABACUS+SLURM │   │DOS/d带/火山图│   │             │
+  │ slabs/sites │   │ MACE / DPA  │   │VASP/CP2K/   │   │E_ad/Gibbs/   │   │ full report │
+  │             │   │             │   │ABACUS+SLURM │   │DOS/d-band    │   │             │
   └─────────────┘   └─────────────┘   └─────────────┘   └──────────────┘   └─────────────┘
         ▲                                                                        │
-        └────────────── 🧠 RSI 递归自我改进：经验 → 规则 → 反哺 ◀────────────────┘
+        └──────────── 🧠 RSI loop: experience → rules → context injection ◀──────┘
 ```
 
-## 🔥 核心黑科技
+## 🔥 Highlights
 
-| | 能力 | 说明 |
+| | Capability | Why it matters |
 |---|---|---|
-| 🛡️ | **Rule Zero 反造假** | 每个能量强制溯源到真实计算文件；Mock 数据强制 `SYNTHETIC` 水印；失败绝不伪装成功 |
-| 🧠 | **RSI 递归自我改进** | 每次计算自动抽取经验 → 人工审核沉淀为规则 → 自动注入智能体上下文 —— **越用越聪明** |
-| 🎯 | **确定性协议层** | 三点吸附能协议固化为纯代码，不依赖 LLM 编排 —— 数值完备性不赌运气 |
-| 🔌 | **Real / Mock 双模引擎** | VASP · CP2K · ABACUS + MACE · DPA-4；无引擎机器一键 Mock 模式，全流程离线跑通 |
-| 🧬 | **失败智能诊断** | 10 类 DFT 失败模式自动识别，秒级给出修复建议（SCF 不收敛？POTCAR 缺失？） |
-| 🔭 | **假设建议引擎** | 根据结果 + 知识库自动提出下一个最有信息量的计算 —— 科研闭环的第一块拼图 |
-| 🌐 | **任意 LLM 后端** | DeepSeek / Qwen / OpenAI / SenseNova / vLLM —— 一个环境变量切换 |
+| 🛡️ | **Rule Zero — zero fabricated data** | Every energy is traceable to a real calculation file; mock data is force-stamped `SYNTHETIC`; failures are reported honestly, never dressed up |
+| 🧠 | **RSI — recursive self-improvement** | Every run extracts structured experience → human review promotes it to a rule → rules are auto-injected into agent context. **The platform gets smarter as you use it** |
+| 🎯 | **Deterministic protocol layer** | The three-point adsorption-energy protocol is hardened Python code, not LLM improvisation — numerical completeness never depends on prompt luck |
+| 🔌 | **Real / Mock dual-mode engines** | VASP · CP2K · ABACUS + MACE · DPA-4; no engine installed? Mock mode runs the entire pipeline offline |
+| 🧬 | **Failure intelligence** | 10 known DFT failure patterns auto-diagnosed with actionable fixes (SCF non-convergence? missing POTCAR? ZBRENT crash?) |
+| 🔭 | **Hypothesis engine** | Suggests the next most informative calculation from results + knowledge base — the first piece of a closed research loop |
+| 🌐 | **Any LLM backend** | DeepSeek / Qwen / OpenAI / SenseNova / vLLM — switch with one environment variable |
 
-## ⚙️ 安装
+## ⚙️ Installation
 
 ```bash
 git clone https://github.com/JXiao-slisa/q-dft.git
 cd q-dft
-pip install -e .            # 核心
-pip install -e ".[mlip]"    # 真实计算模式（MACE / DPA-4，建议先装 PyTorch）
-pip install -e ".[dev]"     # 开发测试
+pip install -e .            # core
+pip install -e ".[mlip]"    # real-computation mode (MACE / DPA-4; install PyTorch first)
+pip install -e ".[dev]"     # development & tests
 ```
 
-要求：Python ≥ 3.10, < 3.13（推荐 3.11）。
+Requires Python ≥ 3.10, < 3.13 (3.11 recommended).
 
 ```bash
-cp .env.example .env        # 填入 LLM_API_KEY（任意 OpenAI 兼容端点）
+cp .env.example .env        # fill in LLM_API_KEY (any OpenAI-compatible endpoint)
 ```
 
-## ⚡ 30 秒极速体验
+## ⚡ 30-Second Quickstart
 
-无需 VASP、无需 GPU、无需集群 —— Mock 引擎全流程离线演示：
+No VASP, no GPU, no cluster needed — run the full pipeline with the mock engine:
 
 ```bash
-qdft check-env                                       # 引擎自检
+qdft check-env                                       # engine self-check
 qdft adsorption-full --inputs '{"element": "Pt", "adsorbate": "CO"}'
-# ✅ 三点吸附能协议：build → MLIP → DFT ×3 → E_ad（12 秒，SYNTHETIC 水印）
+# ✅ three-point protocol: build → MLIP → DFT ×3 → E_ad (12 s, SYNTHETIC-stamped)
 
-qdft batch --inputs-file combos.json --out results.csv   # 高通量筛选
-qdft suggest                                         # AI 提出下一个实验假设
+qdft batch --inputs-file combos.json --out results.csv   # high-throughput screening
+qdft suggest                                         # AI proposes the next hypothesis
 ```
 
-> ⚠️ **Rule Zero**：Mock 模式输出全部为合成数据（强制水印），仅用于流程演示与
-> 开发测试，严禁作为科研结论。正式研究请配置真实引擎（[部署指南](docs/DEPLOYMENT.md)）。
+> ⚠️ **Rule Zero**: mock-mode output is synthetic data (force-stamped) for demo
+> and testing only — never use it as research data. For production, configure
+> real engines ([deployment guide](docs/DEPLOYMENT.md)).
 
-## 🖥️ 真实计算（集群模式）
+## 🖥️ Real Calculations (Cluster Mode)
 
 ```ini
 # .env
@@ -98,50 +101,53 @@ MPI_RUN=srun
 qdft run --inputs '{"element":"Pt","miller":"(111)","adsorbate":"CO","site":"top","dft_calculator":"vasp"}'
 ```
 
-完整 SLURM/开源引擎接入见 **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**。
+Full SLURM / open-source engine setup: **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
 
-## 🧠 RSI：让智能体随你的研究进化
+## 🧠 RSI: An Agent That Evolves With Your Research
 
 ```text
-计算完成 ──▶ 自动抽取经验(YAML) ──▶ pending_rules/ ──▶ 人工审核
-                        ▲                                   │
-                        └── 注入智能体上下文 ◀── knowledge/ ◀─┘
+calculation done ──▶ auto-extract experience (YAML) ──▶ pending_rules/ ──▶ human review
+                              ▲                                            │
+                              └── inject into agent context ◀── knowledge/ ┘
 ```
 
-- 经验可审计：每条规则保留来源计算与审核记录
-- 反哺可配置：`{knowledge_context}` 自动注入建模/DFT 智能体
-- API 可编程：`slisadft.utils.rsi_review.approve_rule(...)` 脚本化审核
+- **Auditable**: every rule keeps its source calculation and review record
+- **Pluggable**: `{knowledge_context}` is auto-injected into the modeling/DFT agents
+- **Programmable**: script reviews via `slisadft.utils.rsi_review.approve_rule(...)`
 
-## 🧪 质量保障
+## 🧪 Quality Assurance
 
 ```bash
-SLISADFT_ENGINE_MODE=mock pytest    # 60 项测试全绿，全程离线
-ruff check src/slisadft             # 代码规范
+SLISADFT_ENGINE_MODE=mock pytest    # 60 tests, all green, fully offline
+ruff check src/slisadft             # lint
 ```
 
-测试矩阵覆盖：VASP 输入/解析、热化学（ZPE/CHE）、Mock 引擎确定性、
-三点协议一致性、批量 CSV、失败诊断、一致性 QA、知识注入、规则审核（含
-路径穿越防护）、端到端工作流。
+Test coverage: VASP input/output parsing (incl. frequency INCAR + real force
+tables), thermochemistry (ZPE / CHE), mock-engine determinism, three-point
+protocol consistency, batch CSV, failure diagnosis, parity QA, knowledge
+injection, rule review (incl. path-traversal guards), end-to-end workflows.
 
-## 🗺️ 路线图
+## 🗺️ Roadmap
 
-- [x] 多智能体流水线 + 三条工作流
-- [x] Real/Mock 双模引擎 + SYNTHETIC 水印
-- [x] RSI 经验沉淀 / 审核流 / 上下文反哺 / 假设建议
-- [x] 确定性三点吸附能协议 · 批量筛选 · 失败智能诊断 · 一致性 QA
-- [ ] P6 完整假设闭环（建议 → 自动执行 → 自动验收）
-- [ ] 主动学习驱动的 CO2RR 高通量扫描
-- [ ] 商业版：Web 界面 + REST API + 任务运行器（[联系获取](#-license)）
+- [x] Multi-agent pipeline + three workflows
+- [x] Real/Mock dual-mode engines + SYNTHETIC stamping
+- [x] RSI experience extraction / review flow / context injection / hypothesis engine
+- [x] Deterministic three-point adsorption protocol · batch screening · failure intelligence · parity QA
+- [ ] Full P6 hypothesis loop (suggest → execute → verify, autonomously)
+- [ ] Active-learning-driven high-throughput electrocatalysis screening
+- [ ] Pro edition: Web UI + REST API + job runner (commercial)
 
-## 🤝 贡献
+## 🤝 Contributing
 
-欢迎 PR！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。新功能请附带 mock
-模式可运行的测试 —— 守护 Rule Zero，人人有责。
+PRs welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md). New features
+should ship with tests that run in mock mode — protecting Rule Zero is
+everyone's job.
 
 ## 📄 License
 
-[Apache-2.0](LICENSE)。VASP 为第三方商业软件，需用户自行持有许可证，
-本项目不捆绑不分发（见 [LICENSES/THIRD_PARTY.md](LICENSES/THIRD_PARTY.md)）。
+[Apache-2.0](LICENSE). VASP is third-party commercial software — users must
+hold their own license; this project neither bundles nor distributes it
+(see [LICENSES/THIRD_PARTY.md](LICENSES/THIRD_PARTY.md)).
 
 ---
 
@@ -149,6 +155,6 @@ ruff check src/slisadft             # 代码规范
 
 **q-dft agent** · *Trustworthy autonomous DFT research, one commit at a time.*
 
-⚡ 如果这个项目对你有帮助，请点一个 Star ⭐
+⚡ If this project helps you, please give it a star ⭐
 
 </div>
