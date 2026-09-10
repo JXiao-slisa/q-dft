@@ -9,7 +9,8 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://www.python.org)
 [![crewAI](https://img.shields.io/badge/multi--agent-crewAI-FF4F5B)](https://github.com/crewAIInc/crewAI)
-[![Tests](https://img.shields.io/badge/tests-60%20passing-3FB950)](tests)
+[![Version](https://img.shields.io/badge/version-0.4.0-6E56CF)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-88%20passing-3FB950)](tests)
 [![Mock Mode](https://img.shields.io/badge/offline-mock%20engine-8B5CF6)](#-30-second-quickstart)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff69b4)](CONTRIBUTING.md)
 
@@ -51,6 +52,7 @@ fabricate a single number.
 | 🔌 | **Real / Mock dual-mode engines** | VASP · CP2K · ABACUS + MACE · DPA-4; no engine installed? Mock mode runs the entire pipeline offline |
 | 🧬 | **Failure intelligence** | 10 known DFT failure patterns auto-diagnosed with actionable fixes (SCF non-convergence? missing POTCAR? ZBRENT crash?) |
 | 🔭 | **Hypothesis engine** | Suggests the next most informative calculation from results + knowledge base — the first piece of a closed research loop |
+| 🚀 | **One-command workflow** | `qdft init` scaffolds a project, `qdft info` inspects structures, `qdft runs` browses your research history, `qdft cite` exports BibTeX |
 | 🌐 | **Any LLM backend** | DeepSeek / Qwen / OpenAI / SenseNova / vLLM — switch with one environment variable |
 
 ## ⚙️ Installation

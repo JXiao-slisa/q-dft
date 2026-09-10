@@ -1,6 +1,6 @@
 [project]
 name = "q-dft"
-version = "0.3.0"
+version = "0.4.0"
 description = "q-dft agent — AI-native multi-agent platform for autonomous first-principles (DFT) computational catalysis research"
 readme = "README.md"
 license = { text = "Apache-2.0" }

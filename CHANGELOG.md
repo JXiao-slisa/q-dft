@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.4.0 — 2026-09-11
+
+第三版本：易用性与科研闭环增强（全部离线可验收）。
+
+### 新增
+* **`qdft init <dir>`**：一键创建研究项目脚手架（.env 模板、组合筛选示例、runs/ 目录），30 秒上手。
+* **`qdft info <structure>`**：结构体检——组分/晶胞/体积/原子数 + DFT 与 MLIP 可行性提示（ASE 支持 POSCAR/CIF/XYZ 等）。
+* **`qdft runs`**：本地研究历史浏览——扫描 runs/ 与 jobs/ 的溯源清单，按时间列出工作流、体系、状态与 E_ad。
+* **`qdft cite`**：引用信息与 BibTeX 输出。
+* **自愈运行（self-healing）**：`utils/remediation.py` 把失败诊断映射为参数补救（SCF 不收敛→NELM×2/ALGO=All；ZBRENT→POTIM↓；OOM→NCORE↓ 等），三点工作流失败时自动补救重试一次并记录审计字段 `remediation`。
+* **溯源落盘修复**：CLI/API 每次运行自动写入 `runs/<时间戳>-<workflow>/run_manifest.json`（v0.2 起 CLI 运行未持久化清单的缺口）。
+
+### 变更
+* 版本 0.4.0；`qdft version` 输出新标识。
+
 ## v0.3.0 — 2026-09-10
 
 第二版本：面向"自主规划与迭代"的能力补全（对标 DREAMS/MatClaw 等自主 DFT Agent 的闭环能力），并修复 v0.2 验收中暴露的吸附能工作流完整性缺陷。
@@ -57,4 +72,4 @@
   → 后处理 → 报告；三条工作流。
 * RSI P1–P3：知识沉淀、自动经验抽取、pending_rules 流程。
 * DSH 聊天插件 v0.0.1（24/24 验收通过）。
-* 内部电催化高通量筛选研究案例（数据与结论随论文另行发表）。
+* CO2RR PtFeCoNiCu HEA 真实研究批次（batch1 + v2/v3/v4）。

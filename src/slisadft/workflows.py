@@ -127,9 +127,10 @@ def run_adsorption_full(inputs: Optional[dict] = None,
         raise RuntimeError(f"adsorption build failed: {ads_raw}")
     surfaces["slab_ads"] = str(ads_raw)
 
-    # -- 三体系一致执行：MLIP 预优化 -> DFT 单点 --------------------------
+    # -- 三体系一致执行：MLIP 预优化 -> DFT 单点（v0.4: 自愈重试）---------
     energies: Dict[str, float] = {}
     details: Dict[str, Dict[str, object]] = {}
+    remediations: List[Dict[str, object]] = []
     for name, structure in surfaces.items():
         mlip = _parse_json_tool_output(
             mace_optimize_tool.func(
@@ -140,10 +141,34 @@ def run_adsorption_full(inputs: Optional[dict] = None,
                     Path(structure).stem + f"_{name}_mlip_opt.vasp")),
             ),
             f"{name}: MLIP optimization")
-        dft = _parse_json_tool_output(
-            dft_optimize_tool.func(
-                str(mlip["output_file"]), calculator=calculator, relax=False),
-            f"{name}: DFT single point")
+
+        def _dft_once(extra_params: Dict[str, object]) -> Dict[str, object]:
+            return _parse_json_tool_output(
+                dft_optimize_tool.func(
+                    str(mlip["output_file"]), calculator=calculator,
+                    relax=False,
+                    incar_overrides=json.dumps(extra_params) if extra_params else ""),
+                f"{name}: DFT single point")
+
+        dft = _dft_once({})
+
+        # v0.4 self-healing: on failure/non-convergence diagnose, remediate,
+        # retry once, and record the intervention (auditable).
+        if dft.get("final_energy_eV") is None or not dft.get("converged", True):
+            from ..utils.failure_diagnosis import diagnose
+            from ..utils.remediation import remediate_incar
+            probe = json.dumps(dft, ensure_ascii=False)
+            codes = [c["code"] for c in diagnose(probe)] or ["SCF_NOT_CONVERGED"]
+            params, applied, notes = remediate_incar({}, codes)
+            if applied:
+                retry = _dft_once(params)
+                if retry.get("final_energy_eV") is not None:
+                    remediations.append({
+                        "system": name, "diagnosis_codes": applied,
+                        "notes": notes, "resolved": bool(retry.get("converged", False)),
+                    })
+                    dft = retry
+
         e = dft.get("final_energy_eV")
         if e is None:
             raise RuntimeError(f"{name}: DFT returned no energy ({dft.get('error')})")
@@ -184,6 +209,7 @@ def run_adsorption_full(inputs: Optional[dict] = None,
                     "adsorbed state use vibrational_thermochemistry_tool",
         },
         "system_details": details,
+        "remediation": remediations,
         "engine_mode": engine_mode(),
         "synthetic": synthetic,
         "elapsed_s": round(time.time() - started, 1),

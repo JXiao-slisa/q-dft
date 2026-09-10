@@ -1,4 +1,4 @@
-# slisaDFT Knowledge Base
+# q-dft Knowledge Base
 
 ## 计算经验规则 / Empirical Rules
 

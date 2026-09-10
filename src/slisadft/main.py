@@ -1,15 +1,12 @@
 #!/usr/bin/env python
-"""q-dft agent command-line interface (package: slisadft).
+"""slisaDFT command-line interface.
 
 Usage:
-    qdft [run]              [--inputs '<json>'] [--json-result PATH]  full pipeline
-    qdft adsorption         [--inputs '<json>'] [--json-result PATH]  adsorption workflow
-    qdft volcano            [--inputs '<json>'] [--json-result PATH]  free-energy diagram
-    qdft adsorption-full    [--inputs '<json>'] [--json-result PATH]  deterministic three-point E_ad
-    qdft batch              --inputs-file FILE [--out CSV]            batch screening
-    qdft suggest            [--inputs '<json>']                       next-step hypotheses
-    qdft check-env                                                    engine availability
-    qdft version                                                      print version
+    slisadft [run]        [--inputs '<json>'] [--json-result PATH]  full pipeline
+    slisadft adsorption   [--inputs '<json>'] [--json-result PATH]  adsorption workflow
+    slisadft volcano      [--inputs '<json>'] [--json-result PATH]  free-energy diagram
+    slisadft check-env                                              engine availability
+    slisadft version                                                print version
 """
 
 from __future__ import annotations
@@ -46,12 +43,18 @@ def run_workflow(workflow: str, inputs: dict, manifest_dir: str = "") -> dict:
     """
     from slisadft.utils.run_manifest import create_run_manifest, finalize_run_manifest
 
+    # v0.4: CLI/API runs always persist a manifest under runs/ so history is
+    # browsable via `qdft runs` (callers may override manifest_dir).
+    if not manifest_dir:
+        from datetime import datetime as _dt
+        manifest_dir = str(Path("runs") /
+                           f"{_dt.now().strftime('%Y%m%d-%H%M%S')}-{workflow}")
+
     # ── deterministic workflows (no LLM required) ────────────────────
     if workflow == "adsorption-full":
         from slisadft.workflows import run_adsorption_full
-        manifest = create_run_manifest(workflow, inputs,
-                                       Path(manifest_dir) if manifest_dir else None)
-        result = run_adsorption_full(inputs, workdir=manifest_dir or None)
+        manifest = create_run_manifest(workflow, inputs, Path(manifest_dir))
+        result = run_adsorption_full(inputs, workdir=manifest_dir)
         manifest_path = manifest.get("manifest_path")
         if manifest_path:
             finalize_run_manifest(Path(manifest_path), status="done", result={
@@ -72,8 +75,7 @@ def run_workflow(workflow: str, inputs: dict, manifest_dir: str = "") -> dict:
 
     from slisadft.crew import prepare_inputs
     inputs = prepare_inputs(inputs)
-    manifest = create_run_manifest(
-        workflow, inputs, Path(manifest_dir) if manifest_dir else None)
+    manifest = create_run_manifest(workflow, inputs, Path(manifest_dir))
 
     crew_cls = _get_crew_class()
     if workflow == "adsorption":
@@ -197,6 +199,107 @@ def _cmd_suggest(args) -> int:
     return 0
 
 
+_ENV_TEMPLATE = """# q-dft agent project configuration
+LLM_BASE_URL=https://api.deepseek.com/v1
+LLM_MODEL=deepseek-chat
+LLM_API_KEY=sk-your-key-here
+SLISADFT_ENGINE_MODE=mock
+
+# real-computation mode (configure engines, then set SLISADFT_ENGINE_MODE=real)
+VASP_EXE=
+VASP_POTCAR_DIR=
+CP2K_EXE=
+ABACUS_EXE=
+SLURM_PARTITION=CPU
+MPI_RUN=mpirun
+REPORT_LANGUAGE=zh
+"""
+
+_COMBOS_TEMPLATE = [
+    {"element": "Pt", "miller": "(111)", "adsorbate": "CO", "site": "top",
+     "dft_calculator": "vasp"},
+    {"element": "Cu", "miller": "(111)", "adsorbate": "OH", "site": "fcc",
+     "dft_calculator": "vasp"},
+]
+
+
+def _cmd_init(args) -> int:
+    """Scaffold a research project directory (env + combos + runs/)."""
+    import json as _json
+    project = Path(args.target) if args.target else Path("qdft-project")
+    if project.exists() and any(project.iterdir()):
+        print(f"❌ directory not empty: {project}")
+        return 2
+    project.mkdir(parents=True, exist_ok=True)
+    (project / ".env").write_text(_ENV_TEMPLATE, encoding="utf-8")
+    (project / "combos.json").write_text(
+        _json.dumps(_COMBOS_TEMPLATE, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
+    (project / "runs").mkdir(exist_ok=True)
+    print(f"✅ project created: {project.resolve()}")
+    print("next steps:")
+    print(f"  1. edit {project / '.env'} (LLM key; engines for real mode)")
+    print(f"  2. cd {project}")
+    print("  3. qdft adsorption-full --inputs '{\"element\":\"Pt\",\"adsorbate\":\"CO\"}'")
+    print("  4. qdft batch --inputs-file combos.json --out results.csv")
+    print("  5. qdft runs")
+    if args.json_result:
+        _write_json_result(args.json_result, {"status": "done",
+                                              "project": str(project.resolve())})
+    return 0
+
+
+def _cmd_info(args) -> int:
+    import json as _json
+    from slisadft.utils.inspect import inspect_structure
+    if not args.target:
+        print("❌ info requires a structure file path")
+        return 2
+    try:
+        info = inspect_structure(args.target)
+    except FileNotFoundError as exc:
+        print(f"❌ {exc}")
+        return 1
+    except Exception as exc:  # unparsable structure
+        print(f"❌ cannot parse structure: {exc}")
+        return 1
+    print(_json.dumps(info, ensure_ascii=False, indent=2))
+    if args.json_result:
+        _write_json_result(args.json_result, {"status": "done", "info": info})
+    return 0
+
+
+def _cmd_runs(args) -> int:
+    import json as _json
+    from slisadft.utils.inspect import list_runs
+    rows = list_runs(limit=args.limit)
+    if not rows:
+        print("no runs recorded yet — manifests are written to runs/ on every run")
+        return 0
+    header = f"{'created_at':<20} {'workflow':<16} {'engine':<6} {'status':<8} {'system':<16} {'E_ad(eV)':>10}"
+    print(header)
+    print("-" * len(header))
+    for r in rows:
+        system = f"{r['element']}{''}/{r['adsorbate']}" if r["element"] else "-"
+        e = f"{r['e_ad_eV']:.4f}" if isinstance(r["e_ad_eV"], (int, float)) else "-"
+        print(f"{r['created_at']:<20} {r['workflow']:<16} {r['engine_mode']:<6} "
+              f"{r['status']:<8} {system:<16} {e:>10}")
+    if args.json_result:
+        _write_json_result(args.json_result, {"status": "done", "runs": rows})
+    return 0
+
+
+def _cmd_cite(args) -> int:
+    import json as _json
+    from slisadft.utils.inspect import citation
+    c = citation()
+    print(c["text"])
+    print("\nBibTeX:\n" + c["bibtex"])
+    if args.json_result:
+        _write_json_result(args.json_result, {"status": "done", "citation": c})
+    return 0
+
+
 def _cmd_batch(args) -> int:
     import json as _json
     from slisadft.workflows import run_batch
@@ -238,14 +341,20 @@ def _cmd_version(_args) -> int:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
-        prog="qdft",
-        description="q-dft agent — AI multi-agent DFT computational catalysis platform")
+        prog="slisadft",
+        description="slisaDFT — AI multi-agent DFT computational catalysis platform")
     parser.add_argument(
         "workflow", nargs="?", default="run",
         choices=["run", "adsorption", "volcano", "adsorption-full",
-                 "batch", "suggest", "check-env", "version"],
-        help="workflow to execute (default: run; adsorption-full/batch/suggest "
-             "are deterministic and need no LLM)")
+                 "batch", "suggest", "init", "info", "runs", "cite",
+                 "check-env", "version"],
+        help="workflow to execute (default: run; adsorption-full/batch/suggest/"
+             "init/info/runs/cite are deterministic and need no LLM)")
+    parser.add_argument(
+        "target", nargs="?", default="",
+        help="init: project directory to create; info: structure file to inspect")
+    parser.add_argument("--limit", type=int, default=20,
+                        help="runs: how many recent runs to show")
     parser.add_argument("--inputs", default="",
                         help='workflow inputs as JSON, e.g. \'{"element": "Cu", "adsorbate": "OH"}\'')
     parser.add_argument("--json-result", default="",
@@ -267,6 +376,14 @@ def main(argv=None) -> int:
         return _cmd_suggest(args)
     if args.workflow == "batch":
         return _cmd_batch(args)
+    if args.workflow == "init":
+        return _cmd_init(args)
+    if args.workflow == "info":
+        return _cmd_info(args)
+    if args.workflow == "runs":
+        return _cmd_runs(args)
+    if args.workflow == "cite":
+        return _cmd_cite(args)
 
     inputs = {}
     if args.inputs:
