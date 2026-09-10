@@ -1,0 +1,23 @@
+calculation:
+  basis_type: pw
+  converged: true
+  convergence: SCF converged
+  ecutwfc: 50
+  final_energy: -37067.858189
+  functional: PBE
+  pseudopotential: SG15 ONCV v1.0
+  scf_thr: 1.0e-06
+engine: abacus
+issues:
+- 'Warning: Some atoms are too close (CO height may need adjustment)'
+result:
+  adsorption_system_energy: -37067.8582
+system: Pt_CO_ads
+tags:
+- abacus
+- pt
+- co
+- adsorption
+- surface
+timestamp: '2026-08-25T16:19:15.437919'
+type: experience

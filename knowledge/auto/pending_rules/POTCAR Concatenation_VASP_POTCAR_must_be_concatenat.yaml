@@ -1,0 +1,13 @@
+category: POTCAR Concatenation
+description: VASP POTCAR must be concatenated with cat, not Python read/write
+rule: Use subprocess.run(['cat'] + parts) to concatenate POTCAR files; do NOT use
+  Python's open().read()/write() which can corrupt the binary format.
+severity: constraint
+source: 'Verified during Phase 1 testing: VASP returned list-directed I/O syntax error
+  when POTCAR was written with Python''s latin-1 encoding.'
+tags:
+- vasp
+- potcar
+- error-prevention
+timestamp: '2026-08-25T15:26:23.014288'
+type: rule

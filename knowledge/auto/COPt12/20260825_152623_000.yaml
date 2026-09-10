@@ -1,0 +1,18 @@
+calculation:
+  converged: true
+  encut: '400'
+  engine: vasp
+  final_energy: -83.37084015
+  final_force: null
+  functional: PBE
+  kpoints: unknown
+  n_ionic_steps: null
+engine: vasp
+issues: []
+result: {}
+system: COPt12
+tags:
+- vasp
+- COPt12
+timestamp: '2026-08-25T15:26:23.013535'
+type: experience

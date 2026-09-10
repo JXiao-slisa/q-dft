@@ -1,0 +1,33 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Runtime caches & engine bundles
+.conda/
+.cache/
+.matplotlib/
+.ipynb_checkpoints/
+.data/
+
+# Large data & research artifacts
+models/mlip/*.pt
+results/
+vasp_real/
+runs/
+*.tar
+
+# OS
+.DS_Store
+Thumbs.db

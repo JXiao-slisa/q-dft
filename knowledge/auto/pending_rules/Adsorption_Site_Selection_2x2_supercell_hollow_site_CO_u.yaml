@@ -1,0 +1,13 @@
+category: Adsorption Site Selection
+description: 2x2 supercell hollow site CO unstable, use top site
+rule: For 2x2 HEA supercells, place adsorbates at top sites (above surface atoms)
+  not hollow sites; hollow CO drifts away in small cells.
+severity: constraint
+source: 'Verified in batch1_v2: hollow CO drifted 8.7A from surface, top site stabilized.'
+tags:
+- adsorption
+- site
+- 2x2
+- supercell
+timestamp: '2026-08-27T17:44:54.781156'
+type: rule

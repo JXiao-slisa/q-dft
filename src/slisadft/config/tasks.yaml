@@ -1,0 +1,122 @@
+build_surface_task:
+  description: >
+    你必须使用 build_surface_tool 或 build_adsorption_tool 或 build_molecule_tool
+    工具来构建模型，具体取决于任务需求。
+    - 构建表面：使用 build_surface_tool
+    - 构建吸附模型：先构建表面，再使用 build_adsorption_tool 添加吸附物；
+      或使用 build_slab_with_adsorbate_tool 一步完成
+    - 构建孤立分子：使用 build_molecule_tool
+    传入参数：
+      - element: {element}
+      - miller_index: {miller}
+      - layers: {layers}
+      - adsorbate: {adsorbate}
+      - site: {site}
+    调用工具后，工具会返回模型文件的绝对路径。
+    你的最终答案必须就是该工具返回的路径，不要添加其他文字。
+  expected_output: "构建好的模型文件的绝对路径（仅路径，不含其他内容）。"
+  agent: surface_scientist
+
+mlip_optimize_task:
+  description: >
+    前一个任务（build_surface_task）已经完成了模型构建，其输出是一个模型文件的绝对路径。
+    这个输出已经作为上下文提供给你。请从上下文中获取该路径。
+    你必须使用 mace_optimize_tool 或 dpa_optimize_tool 工具来对该文件进行结构优化。
+    优先使用 MACE（默认），如果 MACE 不可用则使用 DPA-4。
+    传入参数 input_file 应为该路径，fmax=0.05, steps=200。
+    调用工具后，工具会返回优化结果（JSON格式），包含优化后的结构文件路径和能量信息。
+    你的最终答案必须就是该工具返回的结果，不要添加其他文字。
+    已审核知识库提示（来自过往计算经验，可能为空，仅供参考）：
+    {knowledge_context}
+  expected_output: "优化后的结构文件路径和最终能量（JSON格式字符串）。"
+  agent: mlip_optimizer
+  context: [build_surface_task]
+
+dft_optimize_task:
+  description: >
+    前一个任务（mlip_optimize_task）已经完成了MLIP预优化，其输出是优化后的结构文件路径
+    （包含在JSON格式输出中，key为"output_file"）。
+    这个输出已经作为上下文提供给你。请从上下文中解析出该路径。
+    你必须使用 dft_optimize_tool 工具来对该文件进行高精度DFT优化。
+    使用参数：calculator={dft_calculator} (默认vasp，也可用cp2k或abacus)。
+    结合知识库提示选择合适的计算参数（k点、ENCUT 等）。
+    调用工具后，工具会提交计算任务并等待结果返回。
+    返回结果包含最终能量、最大受力和收敛状态。
+    你的最终答案必须就是该工具返回的结果，不要添加其他文字。
+    已审核知识库提示（来自过往计算经验，可能为空，仅供参考）：
+    {knowledge_context}
+  expected_output: "DFT计算结果的JSON字符串，包含最终能量、最大受力和收敛状态。"
+  agent: dft_engineer
+  context: [mlip_optimize_task]
+
+calculate_adsorption_energy_task:
+  description: >
+    计算吸附能。你需要从上下文中获取以下能量值：
+    - e_slab_ads: 吸附体系的总能量（来自 dft_optimize_task 中的 final_energy_eV）
+    - e_slab: 干净表面的总能量（需要另外计算或从已知数据获取）
+    - e_adsorbate: 自由吸附物分子的总能量（需要另外计算或从已知数据获取）
+
+    使用 adsorption_energy_tool 来计算吸附能。传入参数：
+    - e_slab_ads: 吸附体系能量
+    - e_slab: 干净表面能量
+    - e_adsorbate: 自由分子能量
+    - label: 吸附位点（如'top', 'fcc'）
+    - formula: 吸附物化学式
+
+    你的最终答案必须包含吸附能数值和放热/吸热判断。
+  expected_output: "吸附能计算结果（JSON格式），包含吸附能数值和是否放热。"
+  agent: postprocess_analyst
+  context: [dft_optimize_task]
+
+calculate_free_energy_task:
+  description: >
+    计算反应路径的吉布斯自由能台阶图。
+    从上下文中获取反应步骤的能量数据，使用 reaction_step_diagram_tool 构建自由能图。
+    然后使用 generate_volcano_plot_tool 生成台阶图图片。
+
+    参数：
+    - reaction_steps: JSON格式的反应步骤列表，每步包含 label, delta_e, n_h 等
+    - temperature: 温度（默认298.15）
+    - ph: pH值（默认0）
+    - u_vs_rhe: 施加电位 vs RHE（默认0）
+
+    你的最终答案必须包含自由能台阶数据和生成的图片路径。
+  expected_output: "自由能台阶图数据（JSON格式）和图片路径。"
+  agent: postprocess_analyst
+  context: [dft_optimize_task]
+
+analyze_electronic_structure_task:
+  description: >
+    分析电子结构。根据提供的数据目录，使用 analyze_dos_tool 进行DOS/PDOS分析，
+    计算d带中心、d带宽度和d带填充等关键描述符。
+
+    参数：
+    - doscar_dir: 包含DOSCAR文件的目录路径
+    - atom_indices: 要分析的金属原子索引（可选）
+    - output_plot: DOS图输出路径（可选）
+
+    你的最终答案必须包含d带中心数值、d带宽度和DOS分析结果。
+  expected_output: "电子结构分析结果（JSON格式），包含d带中心、d带宽度等。"
+  agent: postprocess_analyst
+
+generate_report_task:
+  description: >
+    根据前序所有任务的结果，生成一份完整的DFT计算报告。
+    你可以使用 collect_results_tool 逐步收集各章节内容，然后使用
+    generate_report_tool 或 finalize_report_tool 生成最终报告。
+
+    报告应包含以下章节：
+    1. 计算目标
+    2. 模型构建详情
+    3. 结构优化过程（MLIP + DFT）
+    4. 能量与电子结构分析
+    5. 吸附能结果
+    6. 自由能台阶图
+    7. 结论与讨论
+    8. 计算参数附录
+
+    请使用 LLM 对结果进行科学解读和讨论。报告默认使用中文。
+    最终输出应为报告文件的绝对路径。
+  expected_output: "报告文件的绝对路径。"
+  agent: report_writer
+  context: [dft_optimize_task, calculate_adsorption_energy_task, calculate_free_energy_task, analyze_electronic_structure_task]

@@ -1,0 +1,19 @@
+calculation:
+  converged: false
+  encut: '400'
+  engine: vasp
+  final_energy: -14.79506629
+  final_force: null
+  functional: PBE
+  kpoints: unknown
+  n_ionic_steps: null
+engine: vasp
+issues:
+- Calculation did not converge
+result: {}
+system: CO
+tags:
+- vasp
+- CO
+timestamp: '2026-08-25T15:26:22.995540'
+type: experience

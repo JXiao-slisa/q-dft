@@ -1,0 +1,65 @@
+[project]
+name = "q-dft"
+version = "0.3.0"
+description = "q-dft agent — AI-native multi-agent platform for autonomous first-principles (DFT) computational catalysis research"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "q-dft team" }]
+requires-python = ">=3.10,<3.13"
+keywords = ["DFT", "VASP", "CP2K", "ABACUS", "crewAI", "LLM-agent", "catalysis", "materials-science", "quantum"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "crewai[tools]==1.14.7",
+    # crewAI >=1.14 makes LiteLLM optional; our env-configurable
+    # OpenAI-compatible endpoints rely on the LiteLLM fallback.
+    "litellm>=1.60",
+    "python-dotenv>=1.0",
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+    "ase>=3.22",
+]
+
+[project.optional-dependencies]
+# 机器学习势（MACE / DPA-4）；仅真实计算模式需要，mock 模式可跳过
+mlip = ["mace-torch>=0.3.10", "deepmd-kit>=3.0"]
+# 开发与测试
+dev = ["pytest>=8.0", "ruff>=0.5", "httpx>=0.27"]
+
+[project.scripts]
+qdft = "slisadft.main:main"
+qdft-run-crew = "slisadft.main:run"
+qdft-train = "slisadft.main:train"
+qdft-replay = "slisadft.main:replay"
+qdft-test = "slisadft.main:test"
+qdft-trigger = "slisadft.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/slisadft"]
+
+[tool.crewai]
+type = "crew"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
